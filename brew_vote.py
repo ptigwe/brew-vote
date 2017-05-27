@@ -50,8 +50,13 @@ def index():
 def theme():
     return render_template('theme.html')
 
-@app.route('/login')
+@app.route('/login', methods=['POST', 'GET'])
 def login():
+    if request.method == 'POST':
+        print(list(request.form))
+        if request.form['email'] == 'smoked@rye.com':
+            session['username'] = request.form['email']
+            return redirect(url_for('index'))
     return render_template('signin.html')
 
 @app.route('/comp/new', methods=['GET','POST'])

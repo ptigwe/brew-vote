@@ -7,8 +7,8 @@
   <div>
     <h3>Beers</h3>
     {% if not comp.completed %}
-    <a href='/beer/add/{{ comp.id }}'>Add</a>
-    <a href='/comp/rate/{{ comp.id }}'>Rate</a>
+    <a href='/beer/add/{{ comp.id }}'>Add</a> |
+    <a href='/comp/rate/{{ comp.id }}'>Rate</a> |
     <a href='/comp/end/{{ comp.id }}'>End Competition</a>
     {% endif %}
   </div>
