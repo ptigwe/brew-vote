@@ -59,6 +59,11 @@ def login():
             return redirect(url_for('index'))
     return render_template('signin.html')
 
+@app.route('/logout')
+def logout():
+    session.pop('username', None)
+    return redirect(url_for('index'))
+
 @app.route('/comp/new', methods=['GET','POST'])
 def new_comp():
     if request.method == 'POST':
@@ -96,6 +101,10 @@ def add_rating(beers, ratings):
 @app.route('/comp/rate/<comp_id>', methods=['POST', 'GET'])
 def rate_comp(comp_id):
     comp = get_competition(comp_id)
+
+    if comp.completed:
+        return redirect(url_for('view_comp', comp_id=comp_id))
+
     names = get_scoring()
     beers = get_comp_beers(comp_id)
     if request.method == 'POST':
