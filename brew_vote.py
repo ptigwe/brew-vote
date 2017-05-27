@@ -72,9 +72,25 @@ def view_comp(comp_id):
 
 @app.route('/comp/rate/<comp_id>')
 def rate_comp(comp_id):
+    comp = get_competition(comp_id)
     names = get_scoring()
     beers = get_comp_beers(comp_id)
-    return render_template('comp.html', comp_id=comp_id, beers=beers, names=names.keys(), limit=names)
+    return render_template('comp.html', comp=comp, beers=beers, names=names.keys(), limit=names)
+
+def create_beer(name, brewer, style, comp):
+    beer = model.Beer(name, brewer, style, comp)
+    db_session.add(beer)
+    db_session.commit()
+
+@app.route('/beer/add/<comp_id>', methods=['POST','GET'])
+def new_beer(comp_id):
+    comp = get_competition(comp_id)
+    if request.method == 'POST':
+        name = request.form['name']
+        brewer = request.form['brewer']
+        style = request.form['style']
+        create_beer(name, brewer, style, comp)
+    return render_template('add_beer.html', comp=comp)
 
 @app.teardown_appcontext
 def shutdown_session(exception=None):
