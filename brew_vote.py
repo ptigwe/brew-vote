@@ -1,6 +1,7 @@
 from flask import Flask, request, render_template, redirect, url_for, session
 from database import db_session
 import model
+import numpy as np
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
@@ -23,16 +24,22 @@ def get_competition(comp_id):
 def get_comp_beers(comp_id):
     return db_session.query(model.Beer).filter(model.Beer.competition_id == comp_id).all()
 
-def generate_competition(name, beers):
+def generate_competition(name):
     comp = model.Competition(name)
     comp.completed = False
     db_session.add(comp)
-    for i in range(beers):
-        b = model.Beer()
-        b.competition = comp
-        db_session.add(b)
     db_session.commit()
     return comp
+
+def get_beer_ratings(beer_id):
+    return db_session.query(model.Rating).filter(model.Rating.beer_id ==
+            beer_id).all()
+
+@app.template_filter('beer_rating_count')
+def beer_rating_count(beer):
+    ratings = get_beer_ratings(beer.id)
+    scores = [rating.score() for rating in ratings]
+    return np.mean(scores)
 
 @app.route('/')
 def index():
@@ -51,8 +58,7 @@ def login():
 def new_comp():
     if request.method == 'POST':
         name = request.form['name']
-        beers = request.form['beers']
-        comp = generate_competition(name, int(beers))
+        comp = generate_competition(name)
         return redirect(url_for('view_comp', comp_id=comp.id))
     return render_template('new_comp.html')
 
@@ -67,14 +73,30 @@ def end_comp(comp_id):
 @app.route('/comp/view/<comp_id>')
 def view_comp(comp_id):
     comp = get_competition(comp_id)
-    beers = get_comp_beers(comp_id)
+    beers = sorted(get_comp_beers(comp_id), key=lambda x: beer_rating_count(x),
+            reverse=True)
     return render_template('view_comp.html', comp=comp, beers=beers)
 
-@app.route('/comp/rate/<comp_id>')
+def add_rating(beers, ratings):
+    for beer in beers:
+        ap = ratings['Appearance_' + str(beer.id)]
+        fi = ratings['Finish_' + str(beer.id)]
+        ar = ratings['Aroma_' + str(beer.id)]
+        ta = ratings['Taste_' + str(beer.id)]
+        dr = ratings['Drinkability_' + str(beer.id)]
+        rating = model.Rating(beer, ap, fi, ar, ta, dr)
+        db_session.add(rating)
+    db_session.commit()
+
+@app.route('/comp/rate/<comp_id>', methods=['POST', 'GET'])
 def rate_comp(comp_id):
     comp = get_competition(comp_id)
     names = get_scoring()
     beers = get_comp_beers(comp_id)
+    if request.method == 'POST':
+        print(list(request.form.keys()))
+        add_rating(beers, request.form)
+        return redirect(url_for('view_comp', comp_id=comp_id))
     return render_template('comp.html', comp=comp, beers=beers, names=names.keys(), limit=names)
 
 def create_beer(name, brewer, style, comp):

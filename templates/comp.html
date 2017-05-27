@@ -4,19 +4,19 @@
 <h1>Homebrew Comp {{ comp.name }}</h1>
 </div>
 
-<form style='max-width:500px;margin:0 auto'>
+<form style='max-width:500px;margin:0 auto' method='post'>
   {% for beer in beers %}
   <div class="panel panel-default">
     <div class="panel-heading">
       <a data-toggle="collapse" href="#collapse{{ beer.id }}">
-        <h3 class="panel-title">Beer # {{ loop.index }}</h3>
+          <h3 class="panel-title">Beer # {{ loop.index }} # {{ beer.name }}</h3>
       </a>
     </div>
     <div class="panel-collapse collapse" id="collapse{{ beer.id }}">
     <div class="panel-body">
       {% for name in names %}
       <label> {{ name }}: out of {{ limit[name] }} </label>
-      <input id="{{ name }}_{{ beer.id }}" class="form-control" required type="number" min="0" max="{{ limit[name] }}">
+      <input name="{{ name }}_{{ beer.id }}" class="form-control" required type="number" min="0" max="{{ limit[name] }}">
       <br />
       {% endfor %}
     </div>

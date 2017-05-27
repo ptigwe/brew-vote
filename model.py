@@ -36,13 +36,28 @@ class Beer(Base):
         self.style = style
         self.competition = comp
 
-class Voting(Base):
+class Rating(Base):
     __tablename__ = 'voting'
     id = Column(Integer, primary_key=True)
     beer_id = Column(Integer, ForeignKey('beer.id'))
     beer = relationship(Beer)
-    Appearance = Column(Integer)
-    Finish = Column(Integer)
-    Aroma = Column(Integer)
-    Taste = Column(Integer)
-    Drinkability = Column(Integer)
+    appearance = Column(Integer)
+    finish = Column(Integer)
+    aroma = Column(Integer)
+    taste = Column(Integer)
+    drinkability = Column(Integer)
+
+    def __init__(self, beer, ap, fi, ar, ta, dr):
+        self.beer = beer
+        self.appearance = ap
+        self.finish = fi
+        self.aroma = ar
+        self.taste = ta
+        self.drinkability = dr
+
+    def score(self):
+        return (self.appearance + self.finish + self.aroma + self.taste 
+            + self.drinkability)
+
+    def __repr__(self):
+        return str(self.beer.id) + "->" + str(self.score())
