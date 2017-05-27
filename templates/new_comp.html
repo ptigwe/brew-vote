@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+{% block body %}
+<form style='max-width:500px;margin:0 auto' method='post'>
+  <h2>Homebrew Comp</h2>
+  <label for='comp_name'>Competition Title</label>
+  <input name='name' class='form-control'>
+  <label for='beers'>Number of Beers</label>
+  <input name='beers' class='form-control' required type="number" min="2" step="1">
+  <button class="btn btn-lg btn-primary btn-block" type="submit">Create</button>
+</form>
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+{% block body %}
+<div class="page-header" style="margin: 0 auto">
+  <h1>Homebrew Competitions</h1>
+</div>
+
+<div>
+  <a href="/comp/new">New</a>
+  <ul>
+    {% for comp in comps %}
+    <li>
+      <b>{{ comp.name }}</b>
+      <a href="/comp/view/{{comp.id}}">View</a>
+      <a href="/comp/rate/{{comp.id}}">Rate</a>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

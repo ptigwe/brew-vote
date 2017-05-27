@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block body %}
+<div class="page-header" style="margin: 0 auto">
+  <h1>Homebrew Comp {{ comp.name }}</h1>
+</div>
+<div style='max-width:500px;margin:0 auto'>
+  <div>
+    <h3>Beers</h3>
+    {% if not comp.completed %}
+    <a href='/beer/add/{{ comp.id }}'>Add</a>
+    <a href='/comp/end/{{ comp.id }}'>End Competition</a>
+    {% endif %}
+  </div>
+  <ul>
+    {% for beer in beers %}
+      <li>
+        {{ beer.brewer }} : {{ beer.name }} : {{ beer.style}}
+        <a href='/beer/edit/{{ beer.id }}'>Edit</a>
+      </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}
