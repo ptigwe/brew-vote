@@ -5,13 +5,13 @@
 </div>
 
 <div>
-  <a href="/comp/new">New</a>
+  <a href="{{url_for('new_comp')}}">New</a>
   <ul>
     {% for comp in comps %}
     <li>
       <b>{{ comp.name }}</b>
-      <a href="/comp/view/{{comp.id}}">View</a>
-      <a href="/comp/rate/{{comp.id}}">Rate</a>
+      <a href="{{url_for('view_comp', comp_id=comp.id)}}">View</a>
+      <a href="{{url_for('rate_comp', comp_id=comp.id)}}">Rate</a>
     </li>
     {% endfor %}
   </ul>

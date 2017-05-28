@@ -7,9 +7,9 @@
   <div>
     <h3>Beers</h3>
     {% if not comp.completed %}
-    <a href='/beer/add/{{ comp.id }}'>Add</a> |
-    <a href='/comp/rate/{{ comp.id }}'>Rate</a> |
-    <a href='/comp/end/{{ comp.id }}'>End Competition</a>
+    <a href="{{ url_for('new_beer', comp_id=comp.id) }}">Add</a> |
+    <a href="{{ url_for('rate_comp', comp_id=comp.id) }}">Rate</a> |
+    <a href="{{ url_for('end_comp', comp_id=comp.id) }}">End Competition</a>
     {% endif %}
   </div>
   <ul>
@@ -17,9 +17,8 @@
       <li>
           {{ beer.brewer }} : {{ beer.name }} : {{ beer.style }} : {{ beer |
           beer_rating_count }}
-        <a href='/beer/edit/{{ beer.id }}'>Edit</a>
         {% if not comp.completed %}
-        <a href='/beer/rate/{{ beer.id }}'>Rate</a>
+        <a href="{{ url_for('rate_beer', beer_id=beer.id) }}">Rate</a>
         {% endif %}
       </li>
     {% endfor %}

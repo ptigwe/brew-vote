@@ -13,7 +13,7 @@
 <button class="btn btn-lg btn-primary btn-block" type="submit">Add</button>
 <h1>
   <span class='label label-danger'>
-    <a href='/comp/view/{{comp.id}}' style='color:white'>Done</a>
+    <a href="{{ url_for('view_comp', comp_id=comp.id) }}" style='color:white'>Done</a>
   </span>
 </h1>
 </form>
