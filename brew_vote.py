@@ -111,7 +111,7 @@ def rate_comp(comp_id):
         print(list(request.form.keys()))
         add_rating(beers, request.form)
         return redirect(url_for('view_comp', comp_id=comp_id))
-    return render_template('comp.html', comp=comp, beers=beers, names=names.keys(), limit=names)
+    return render_template('rate_comp.html', comp=comp, beers=beers, names=names.keys(), limit=names)
 
 def create_beer(name, brewer, style, comp):
     beer = model.Beer(name, brewer, style, comp)
@@ -127,6 +127,18 @@ def new_beer(comp_id):
         style = request.form['style']
         create_beer(name, brewer, style, comp)
     return render_template('add_beer.html', comp=comp)
+
+def get_beer(beer_id):
+    return db_session.query(model.Beer).filter(model.Beer.id == beer_id).first()
+
+@app.route('/beer/rate/<beer_id>', methods=['POST', 'GET'])
+def rate_beer(beer_id):
+    beer = get_beer(beer_id)
+    names = get_scoring()
+    if request.method == 'POST':
+        add_rating([beer], request.form)
+        return redirect(url_for('view_comp', comp_id=beer.competition_id))
+    return render_template('rate_beer.html', beer=beer, comp=beer.competition, names=names.keys(), limit=names)
 
 @app.teardown_appcontext
 def shutdown_session(exception=None):

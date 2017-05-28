@@ -18,6 +18,9 @@
           {{ beer.brewer }} : {{ beer.name }} : {{ beer.style }} : {{ beer |
           beer_rating_count }}
         <a href='/beer/edit/{{ beer.id }}'>Edit</a>
+        {% if not comp.completed %}
+        <a href='/beer/rate/{{ beer.id }}'>Rate</a>
+        {% endif %}
       </li>
     {% endfor %}
   </ul>

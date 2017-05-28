@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+{% block body %}
+<div class="page-header" style="margin: 0 auto">
+  <h1>Homebrew Comp {{ comp.name }}</h1>
+</div>
+
+<form style='max-width:500px;margin:0 auto' method='post'>
+  {% include 'beer_rate_form.html' %}
+  <button class="btn btn-lg btn-primary btn-block" type="submit">Submit</button>
+</form>
+{% endblock %}
