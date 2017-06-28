@@ -1,0 +1,9 @@
+# SQLite
+
+To generate an sqlite database, call the `database.init_db` function from within
+the python REPL.
+
+# Run
+
+$ gunicorn brew_vote:app
+
