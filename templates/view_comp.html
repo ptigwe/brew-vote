@@ -12,16 +12,35 @@
     <a href="{{ url_for('end_comp', comp_id=comp.id) }}">End Competition</a>
     {% endif %}
   </div>
-  <ul>
-    {% for beer in beers %}
-      <li>
-          {{ beer.brewer }} : {{ beer.name }} : {{ beer.style }} : {{ beer |
-          beer_rating_count }}
-        {% if not comp.completed %}
-        <a href="{{ url_for('rate_beer', beer_id=beer.id) }}">Rate</a>
-        {% endif %}
-      </li>
-    {% endfor %}
-  </ul>
+  <div class="row">
+    <div class="">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Brewer</th>
+            <th>Beer Name</th>
+            <th>Beer Style</th>
+            <th>Rating</th>
+            {% if not comp.completed %}
+            <th> Rate </th>
+            {% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for beer in beers %}
+          <tr>
+            <td>{{ beer.brewer }}</td>
+            <td>{{ beer.name }}</td>
+            <td>{{ beer.style }}</td>
+            <td>{{ beer | beer_rating_count }}</td>
+            {% if not comp.completed %}
+            <td><a href="{{ url_for('rate_beer', beer_id=beer.id) }}">Rate</a></td>
+            {% endif %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>
 {% endblock %}
