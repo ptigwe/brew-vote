@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect, url_for, session
+from flask import Flask, request, render_template, redirect, url_for, session, flash
 from database import db_session
 import model
 import numpy as np
@@ -34,15 +34,26 @@ def generate_competition(name):
     db_session.commit()
     return comp
 
-def get_beer_ratings(beer_id):
-    return db_session.query(model.Rating).filter(model.Rating.beer_id ==
-            beer_id).all()
+def get_beer_ratings(beer_id, sess_user=True):
+    res = db_session.query(model.Rating).filter(model.Rating.beer_id ==
+            beer_id)
+    if sess_user:
+        comp_id = db_session.query(model.Beer).filter(model.Beer.id ==
+                beer_id).first().competition_id
+        voter_id = session.get('comp_' + str(comp_id), -1)
+        print("Beer ratings sess_id", str(voter_id))
+        if voter_id >= 0:
+            res = res.filter(model.Rating.rater_id == voter_id)
+    return res.all()
 
-@app.template_filter('beer_rating_count')
-def beer_rating_count(beer):
-    ratings = get_beer_ratings(beer.id)
+def beer_rating_count(beer, sess_user=True):
+    ratings = get_beer_ratings(beer.id, sess_user)
     scores = [rating.score() for rating in ratings]
     return np.mean(scores)
+
+@app.context_processor
+def beer_rating_func():
+    return dict(beer_rating_func=beer_rating_count)
 
 @app.route('/')
 def index():
@@ -86,8 +97,10 @@ def end_comp(comp_id):
 @app.route('/comp/view/<comp_id>')
 def view_comp(comp_id):
     comp = get_competition(comp_id)
-    beers = sorted(get_comp_beers(comp_id), key=lambda x: beer_rating_count(x),
+    beers = sorted(get_comp_beers(comp_id), key=lambda x: beer_rating_count(x, not comp.completed),
             reverse=True)
+    print(beers)
+    print(get_beer_ratings(beers[0].id, False))
     return render_template('view_comp.html', comp=comp, beers=beers)
 
 def add_rating(beers, ratings):
@@ -97,7 +110,13 @@ def add_rating(beers, ratings):
         ar = ratings['Aroma_' + str(beer.id)]
         ta = ratings['Taste_' + str(beer.id)]
         dr = ratings['Drinkability_' + str(beer.id)]
-        rating = model.Rating(beer, ap, fi, ar, ta, dr)
+        rating = None
+        if 'comp_' + str(beer.competition_id) in session:
+            rating = db_session.query(model.Rating).filter(model.Rating.beer_id == beer.id,
+                    model.Rating.rater_id == session['comp_' + str(beer.competition_id)]).first()
+        if rating is None:
+            rating = model.Rating(beer, ap, fi, ar, ta, dr)
+            rating.rater_id = session['comp_' + str(beer.competition_id)]
         db_session.add(rating)
     db_session.commit()
 
@@ -107,6 +126,14 @@ def rate_comp(comp_id):
 
     if comp.completed:
         return redirect(url_for('view_comp', comp_id=comp_id))
+
+    if 'comp_' + comp_id not in session:
+        session['comp_' + comp_id] = comp.curr_voters
+        comp.curr_voters += 1
+        db_session.add(comp)
+        db_session.commit()
+
+    flash(" ".join(map(str, ["Voting on competition", comp_id, "with voter id", session['comp_' + comp_id]])));
 
     names = get_scoring()
     beers = get_comp_beers(comp_id)
@@ -138,9 +165,13 @@ def get_beer(beer_id):
 def rate_beer(beer_id):
     beer = get_beer(beer_id)
     names = get_scoring()
+
     if request.method == 'POST':
         add_rating([beer], request.form)
         return redirect(url_for('view_comp', comp_id=beer.competition_id))
+
+    flash(" ".join(map(str, ["Voting on competition", beer.competition_id, "with voter id",
+        session['comp_' + str(beer.competition_id)]])));
     return render_template('rate_beer.html', beer=beer, comp=beer.competition, names=names.keys(), limit=names)
 
 @app.teardown_appcontext

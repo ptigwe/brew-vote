@@ -9,10 +9,12 @@ class Competition(Base):
     name = Column(String(120))
     completed = Column(Boolean, default=False)
     comp_date = Column(DateTime, default=datetime.datetime.utcnow)
+    curr_voters = Column(Integer, default=0)
 
     def __init__(self, name=None):
         self.name = name
         self.comp_date = datetime.datetime.utcnow()
+        self.curr_voters = 0
         if name is None or name == '':
             self.name = self.name_from_date(self.comp_date)
 
