@@ -2,9 +2,12 @@ from flask import Flask, request, render_template, redirect, url_for, session
 from database import db_session
 import model
 import numpy as np
+import os
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
+app.secret_key = os.environ.get('BREW_VOTE_KEY', 'secret_key')
+print("Secret Key is {}", app.secret_key)
 
 def get_scoring():
     return {'Appearance': 10, 'Finish': 20, 'Aroma': 10, 'Taste': 30, 'Drinkability': 30}

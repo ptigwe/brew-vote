@@ -40,6 +40,7 @@ class Rating(Base):
     __tablename__ = 'voting'
     id = Column(Integer, primary_key=True)
     beer_id = Column(Integer, ForeignKey('beer.id'))
+    rater_id = Column(Integer)
     beer = relationship(Beer)
     appearance = Column(Integer)
     finish = Column(Integer)
