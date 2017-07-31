@@ -10,7 +10,7 @@ app.secret_key = os.environ.get('BREW_VOTE_KEY', 'secret_key')
 print("Secret Key is {}", app.secret_key)
 
 def get_scoring():
-    return {'Appearance': 10, 'Finish': 20, 'Aroma': 10, 'Taste': 30, 'Drinkability': 30}
+    return {'appearance': 10, 'finish': 20, 'aroma': 10, 'taste': 30, 'drinkability': 30}
 
 def get_beers(comp_id, names):
     return [dict(zip(['id'] + list(names.keys()), [i + 1] + [0] * len(names))) for i in range(5)]
@@ -104,11 +104,11 @@ def view_comp(comp_id):
 
 def add_rating(beers, ratings):
     for beer in beers:
-        ap = ratings['Appearance_' + str(beer.id)]
-        fi = ratings['Finish_' + str(beer.id)]
-        ar = ratings['Aroma_' + str(beer.id)]
-        ta = ratings['Taste_' + str(beer.id)]
-        dr = ratings['Drinkability_' + str(beer.id)]
+        ap = ratings['appearance_' + str(beer.id)]
+        fi = ratings['finish_' + str(beer.id)]
+        ar = ratings['aroma_' + str(beer.id)]
+        ta = ratings['taste_' + str(beer.id)]
+        dr = ratings['drinkability_' + str(beer.id)]
         rating = None
         if 'comp_' + str(beer.competition_id) in session:
             rating = db_session.query(model.Rating).filter(model.Rating.beer_id == beer.id,
@@ -118,6 +118,15 @@ def add_rating(beers, ratings):
             rating.rater_id = session['comp_' + str(beer.competition_id)]
         db_session.add(rating)
     db_session.commit()
+
+def rate_to_dict(rating):
+    d = dict()
+    for name in get_scoring():
+        if rating is None:
+            d[name] = 0
+        else:
+            d[name] = rating.__dict__[name]
+    return d
 
 @app.route('/comp/rate/<comp_id>', methods=['POST', 'GET'])
 def rate_comp(comp_id):
@@ -136,11 +145,20 @@ def rate_comp(comp_id):
 
     names = get_scoring()
     beers = get_comp_beers(comp_id)
+    rate_query = db_session.query(model.Rating).filter(model.Rating.rater_id == session['comp_' + comp_id])
+
     if request.method == 'POST':
         print(list(request.form.keys()))
         add_rating(beers, request.form)
         return redirect(url_for('view_comp', comp_id=comp_id))
-    return render_template('rate_comp.html', comp=comp, beers=beers, names=names.keys(), limit=names)
+
+    rating = []
+    for beer in beers:
+        rate = rate_to_dict(rate_query.filter(model.Rating.beer_id == beer.id).first())
+        rating.append(rate)
+
+    print(rating)
+    return render_template('rate_comp.html', comp=comp, beer_rating=zip(beers,rating), names=names.keys(), limit=names)
 
 def create_beer(name, brewer, style, comp):
     beer = model.Beer(name, brewer, style, comp)

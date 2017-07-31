@@ -5,7 +5,7 @@
 </div>
 
 <form style='max-width:500px;margin:0 auto' method='post'>
-  {% for beer in beers %}
+  {% for (beer, rating) in beer_rating %}
     {% with idx=loop.index %}
     {% include 'beer_rate_form.html' %}
     {% endwith %}
