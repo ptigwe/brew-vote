@@ -100,7 +100,6 @@ def view_comp(comp_id):
     beers = sorted(get_comp_beers(comp_id), key=lambda x: beer_rating_count(x, not comp.completed),
             reverse=True)
     print(beers)
-    print(get_beer_ratings(beers[0].id, False))
     return render_template('view_comp.html', comp=comp, beers=beers)
 
 def add_rating(beers, ratings):
