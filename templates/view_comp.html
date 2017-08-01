@@ -29,9 +29,15 @@
         <tbody>
           {% for beer in beers %}
           <tr>
+            {% if comp.completed %}
             <td>{{ beer.brewer }}</td>
             <td>{{ beer.name }}</td>
             <td>{{ beer.style }}</td>
+            {% else %}
+            <td>{{ beer.id }}</td>
+            <td>{{ beer.id }}</td>
+            <td>{{ beer.id }}</td>
+            {% endif %}
             <td>{{ beer_rating_func(beer, not comp.completed) }}</td>
             {% if not comp.completed %}
             <td><a href="{{ url_for('rate_beer', beer_id=beer.id) }}">Rate</a></td>
