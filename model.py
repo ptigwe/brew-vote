@@ -30,7 +30,7 @@ class Beer(Base):
     competition_id = Column(Integer, ForeignKey('competition.id'))
     competition = relationship(Competition)
 
-    def __init__(self, brewer, name, style, comp):
+    def __init__(self, name, brewer, style, comp):
         self.brewer = brewer
         if name == "":
             name = "Beer"
