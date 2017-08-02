@@ -141,7 +141,7 @@ def rate_comp(comp_id):
         db_session.add(comp)
         db_session.commit()
 
-    flash(" ".join(map(str, ["Voting on competition", comp_id, "with voter id", session['comp_' + comp_id]])));
+    flash(" ".join(map(str, ["Voting on competition", comp_id, "with voter id", session['comp_' + comp_id]])))
 
     names = get_scoring()
     beers = get_comp_beers(comp_id)
@@ -181,15 +181,29 @@ def get_beer(beer_id):
 @app.route('/beer/rate/<beer_id>', methods=['POST', 'GET'])
 def rate_beer(beer_id):
     beer = get_beer(beer_id)
+    comp = beer.competition
     names = get_scoring()
+
+    if comp.completed:
+        return redirect(url_for('view_comp', comp_id=comp_id))
+
+    if 'comp_' + str(comp.id) not in session:
+        session['comp_' + str(comp.id)] = comp.curr_voters
+        comp.curr_voters += 1
+        db_session.add(comp)
+        db_session.commit()
+
+    flash(" ".join(map(str, ["Voting on competition", comp.id, "with voter id",
+        session['comp_' + str(comp.id)]])))
 
     if request.method == 'POST':
         add_rating([beer], request.form)
         return redirect(url_for('view_comp', comp_id=beer.competition_id))
 
-    flash(" ".join(map(str, ["Voting on competition", beer.competition_id, "with voter id",
-        session['comp_' + str(beer.competition_id)]])));
-    return render_template('rate_beer.html', beer=beer, comp=beer.competition, names=names.keys(), limit=names)
+    rate_query = db_session.query(model.Rating).filter(model.Rating.rater_id == session['comp_' + str(comp.id)] and model.Rating.beer_id == beer_id)
+    rate = rate_to_dict(rate_query.first())
+
+    return render_template('rate_beer.html', beer=beer, comp=beer.competition, names=names.keys(), limit=names, rating=rate)
 
 @app.teardown_appcontext
 def shutdown_session(exception=None):
