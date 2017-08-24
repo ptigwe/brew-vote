@@ -202,8 +202,8 @@ def rate_beer(beer_id):
         add_rating([beer], request.form)
         return redirect(url_for('view_comp', comp_id=beer.competition_id))
 
-    rate_query = db_session.query(model.Rating).filter(model.Rating.rater_id == session['comp_' + str(comp.id)] and model.Rating.beer_id == beer_id)
-    rate = rate_to_dict(rate_query.first())
+    rate_query = db_session.query(model.Rating).filter(model.Rating.rater_id == session['comp_' + str(comp.id)])
+    rate = rate_to_dict(rate_query.filter(model.Rating.beer_id == beer.id).first())
 
     return render_template('rate_beer.html', beer=beer, comp=beer.competition, names=names.keys(), limit=names, rating=rate)
 
