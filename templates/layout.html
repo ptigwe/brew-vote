@@ -9,7 +9,7 @@
     <meta name="author" content="">
     <link rel="icon" href="../../favicon.ico">
 
-    <title>Theme Template for Bootstrap</title>
+    <title>Liverpool Homebrew Club</title>
 
     <!-- Bootstrap core CSS -->
     <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
@@ -75,7 +75,7 @@
 
       <!-- Main jumbotron for a primary marketing message or call to action -->
       <div class="jumbotron">
-        <h1>Liverpool Homebrew Club</h1>
+        <img src="{{ url_for('static', filename='img/banner.jpg') }}" width="100%">
       </div>
 
       {% for message in get_flashed_messages() %}
