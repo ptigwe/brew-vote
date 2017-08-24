@@ -34,9 +34,9 @@
             <td>{{ beer.name }}</td>
             <td>{{ beer.style }}</td>
             {% else %}
-            <td>{{ beer.id }}</td>
-            <td>{{ beer.id }}</td>
-            <td>{{ beer.id }}</td>
+            <td>{{ loop.index }}</td>
+            <td>{{ loop.index }}</td>
+            <td>{{ loop.index }}</td>
             {% endif %}
             <td>{{ beer_rating_func(beer, not comp.completed) }}</td>
             {% if not comp.completed %}
