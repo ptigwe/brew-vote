@@ -116,6 +116,8 @@ def add_rating(beers, ratings):
         if rating is None:
             rating = model.Rating(beer, ap, fi, ar, ta, dr)
             rating.rater_id = session['comp_' + str(beer.competition_id)]
+        else:
+            rating.update(ap, fi, ar, ta, dr)
         db_session.add(rating)
     db_session.commit()
 

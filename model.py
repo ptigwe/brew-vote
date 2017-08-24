@@ -58,6 +58,13 @@ class Rating(Base):
         self.taste = ta
         self.drinkability = dr
 
+    def update(self, ap, fi, ar, ta, dr):
+        self.appearance = ap
+        self.finish = fi
+        self.aroma = ar
+        self.taste = ta
+        self.drinkability = dr
+
     def score(self):
         return (self.appearance + self.finish + self.aroma + self.taste 
             + self.drinkability)
